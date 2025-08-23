@@ -1,0 +1,85 @@
+import React, { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import products from '../product'
+import { Button, Card, Col, Image, ListGroup, ListGroupItem, Row } from 'react-bootstrap'
+import Rating from '../components/Rating'
+import axios from 'axios'
+
+const ProductScreen = () => {
+    const { id: productId } = useParams()
+    const [product, setProduct] = useState({})
+
+    useEffect(() => {
+        fetchProductById()
+    }, [productId])
+
+    const fetchProductById = async () => {
+        try {
+            const response = await axios.get(`/api/products/${productId}`)
+            if (response?.data) {
+                setProduct(response.data)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+
+    }
+    // const product = products.find((p) => p._id === productId)
+    return (
+        <>
+            <Link className='btn btn-light my-3' to='/'>Go Back</Link>
+            <Row>
+                <Col md={5}>
+                    <Image src={product?.image} alt={product?.name} fluid />
+                </Col>
+                <Col md={4}>
+                    <ListGroup variant='flush'>
+                        <ListGroupItem>
+                            <h3>{product?.name}</h3>
+                        </ListGroupItem>
+                        <ListGroupItem>
+                            <Rating value={product?.rating} text={`${product?.numReviews} reviews`} />
+                        </ListGroupItem>
+                        <ListGroupItem>
+                            Price: &#8377;{product?.price}
+                        </ListGroupItem>
+                        <ListGroupItem>
+                            Desciption: {product?.description}
+                        </ListGroupItem>
+                    </ListGroup>
+                </Col>
+                <Col md={3}>
+                    <Card>
+                        <ListGroup variant='flush'>
+                            <ListGroupItem>
+                                <Row>
+                                    <Col>Price:</Col>
+                                    <Col>
+                                        <strong>&#8377;{product?.price}</strong></Col>
+                                </Row>
+                            </ListGroupItem>
+                            <ListGroupItem>
+                                <Row>
+                                    <Col>Status:</Col>
+                                    <Col>
+                                        <strong>{product?.countInStock > 0 ? "In Stock" : "Out of Stock"}</strong></Col>
+                                </Row>
+                            </ListGroupItem>
+                            <ListGroupItem>
+                                <Button
+                                    className='btn-block'
+                                    type='button'
+                                    disabled={product?.countInStock === 0}
+                                >
+                                    Add To Cart
+                                </Button>
+                            </ListGroupItem>
+                        </ListGroup>
+                    </Card>
+                </Col>
+            </Row>
+        </>
+    )
+}
+
+export default ProductScreen
