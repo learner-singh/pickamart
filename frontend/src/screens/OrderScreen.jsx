@@ -5,6 +5,7 @@ import {
   useGetOrderDetailsQuery,
   usePayOrderMutation,
   useGetPayPalClientIdQuery,
+  useDeliverOrderMutation,
 } from "../slices/ordersApislice";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
@@ -47,6 +48,8 @@ const OrderScreen = () => {
   } = order ?? {};
 
   const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation();
+  const [deliverOrder, { isLoading: loadingDeliver }] =
+    useDeliverOrderMutation();
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
   const {
     data: paypal,
@@ -95,7 +98,7 @@ const OrderScreen = () => {
   function onError(err) {
     toast.error(err?.data?.message || err?.message);
   }
-  
+
   function createOrder(data, actions) {
     return actions.order
       .create({
@@ -111,6 +114,16 @@ const OrderScreen = () => {
         return orderId;
       });
   }
+
+  const deliverOrderHandler = async () => {
+    try {
+      await deliverOrder(orderId);
+      refetch();
+      toast.success("Order delivered.");
+    } catch (err) {
+      toast.error(err?.data?.message || err?.message);
+    }
+  };
 
   return isLoading ? (
     <Loader />
@@ -233,6 +246,18 @@ const OrderScreen = () => {
                       </div>
                     </div>
                   )}
+                </ListGroupItem>
+              )}
+              {loadingDeliver && <Loader />}
+              {userInfo?.isAdmin && isPaid && !isDelivered && (
+                <ListGroupItem>
+                  <Button
+                    type="button"
+                    className="btn btn-blocy"
+                    onClick={deliverOrderHandler}
+                  >
+                    Mark As Delivered
+                  </Button>
                 </ListGroupItem>
               )}
             </ListGroup>
