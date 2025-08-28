@@ -98,7 +98,7 @@ const ProductScreen = () => {
         </Message>
       ) : (
         <>
-          <Meta title={product?.name} />
+          {/* <Meta title={product?.name} /> */}
           <Row>
             <Col md={5}>
               <Image src={product?.image} alt={product?.name} fluid />
