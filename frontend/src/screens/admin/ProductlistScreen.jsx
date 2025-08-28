@@ -8,11 +8,15 @@ import { Button, Col, Row, Table } from "react-bootstrap";
 import { FaPen, FaPlus, FaTrash } from "react-icons/fa";
 import Loader from "../../components/Loader";
 import Message from "../../components/Message";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import Paginate from "../../components/Paginate";
 
 const ProductlistScreen = () => {
-  const { data: products, isLoading, error, refetch } = useGetProductsQuery();
+  const { pageNumber } = useParams();
+  const { data, isLoading, error, refetch } = useGetProductsQuery({
+    pageNumber,
+  });
   const [createProduct, { isloading: loadingCreate }] =
     useCreateProductMutation();
   const [deleteProduct, { isLoading: loadingDeleteProduct }] =
@@ -21,11 +25,11 @@ const ProductlistScreen = () => {
   const deleteHandler = async (id) => {
     if (window.confirm("Are you sure to delete this product?")) {
       try {
-        await deleteProduct(id)
-        refetch()
-        toast.success("Product deleted.")
+        await deleteProduct(id);
+        refetch();
+        toast.success("Product deleted.");
       } catch (err) {
-        toast.error(err?.data?.message || err?.err)
+        toast.error(err?.data?.message || err?.err);
       }
     }
   };
@@ -60,43 +64,46 @@ const ProductlistScreen = () => {
       ) : error ? (
         <Message variant={"danger"}>{error}</Message>
       ) : (
-        <Table striped hover responsive className="table-sm">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>NAME</th>
-              <th>PRICE</th>
-              <th>CATEGORY</th>
-              <th>BRAND</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {products?.map((product) => (
-              <tr key={product?._id}>
-                <td>{product?._id}</td>
-                <td>{product?.name}</td>
-                <td>&#8377;{product?.price}</td>
-                <td>{product?.category}</td>
-                <td>{product?.brand}</td>
-                <td>
-                  <Link to={`/admin/product/${product?._id}/edit`}>
-                    <Button variant="light" className="btn-sm mx-2">
-                      <FaPen />
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="light"
-                    className="btn-sm"
-                    onClick={() => deleteHandler(product?._id)}
-                  >
-                    <FaTrash />
-                  </Button>
-                </td>
+        <>
+          <Table striped hover responsive className="table-sm">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>PRICE</th>
+                <th>CATEGORY</th>
+                <th>BRAND</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {data?.products?.map((product) => (
+                <tr key={product?._id}>
+                  <td>{product?._id}</td>
+                  <td>{product?.name}</td>
+                  <td>&#8377;{product?.price}</td>
+                  <td>{product?.category}</td>
+                  <td>{product?.brand}</td>
+                  <td>
+                    <Link to={`/admin/product/${product?._id}/edit`}>
+                      <Button variant="light" className="btn-sm mx-2">
+                        <FaPen />
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="light"
+                      className="btn-sm"
+                      onClick={() => deleteHandler(product?._id)}
+                    >
+                      <FaTrash />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Paginate pages={data?.pages} page={data?.page} isAdmin={true} />
+        </>
       )}
     </>
   );
