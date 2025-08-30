@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../slices/cartSlice";
 import { toast } from "react-toastify";
 import Meta from "../components/Meta";
+import CartImage from '../assets/cart.png'
 
 const ProductScreen = () => {
   const { id: productId } = useParams();
@@ -101,7 +102,7 @@ const ProductScreen = () => {
           {/* <Meta title={product?.name} /> */}
           <Row>
             <Col md={5}>
-              <Image src={product?.image} alt={product?.name} fluid />
+              <Image src={product?.image ?? CartImage} alt={product?.name} fluid />
             </Col>
             <Col md={4}>
               <ListGroup variant="flush">
