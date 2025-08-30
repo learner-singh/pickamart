@@ -43,6 +43,11 @@ table th {
   margin-top: 10px;
 }
 
+.carousel-item {
+  max-height: "500px";
+}
+
+
 .carousel-caption {
   position: absolute;
   width: 100%;
